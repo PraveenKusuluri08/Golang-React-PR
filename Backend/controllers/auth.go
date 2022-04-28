@@ -53,7 +53,7 @@ func SignUp() gin.HandlerFunc {
 		user.Password = helpers.PasswordHasher(user.Password)
 
 		// token, _ := helpers.GenerateAuthJWTToken(user)
-		tokenData, _ := helpers.GenerateToken(user.Email, user.FirstName, user.Uid, user.Role)
+		tokenData, _ := helpers.GenerateToken(user.Email)
 
 		user.Token = tokenData.Token
 		user.RefreshToken = tokenData.RefreshToken
@@ -74,8 +74,34 @@ func SignUp() gin.HandlerFunc {
 	}
 }
 
-func SignIn() gin.HandlerFunc{
-	return func(c *gin.Context){
-		
+func SignIn() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+		var user models.User
+		var actualUser models.User
+		collection := helpers.GetCollection(dbName, collectionName)
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+			log.Fatal(err)
+			return
+		}
+		filter := bson.M{"email": user.Email}
+		err := collection.FindOne(ctx, filter).Decode(&actualUser)
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid login"})
+			return
+		}
+		match := helpers.CompareHashAndPassword(user.Password, actualUser.Password)
+
+		if !match {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid login Please check password"})
+			return
+		}
+		token, _ := helpers.GenerateToken(user.Email)
+
+		helpers.UpdateToken(token.Token, token.RefreshToken, actualUser.Uid)
+
+		c.JSON(http.StatusOK, actualUser)
 	}
 }

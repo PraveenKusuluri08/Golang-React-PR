@@ -1,6 +1,7 @@
 [GIN-debug] POST   /user/signup              --> github.com/PraveenKusuluri08/golang-jwt-auth/controllers.SignUp.func1 (4 handlers)
-[GIN-debug] GET    /api-test                 --> main.main.func1 (4 handlers)
+[GIN-debug] POST   /user/signin              --> github.com/PraveenKusuluri08/golang-jwt-auth/controllers.SignIn.func1 (4 handlers)
+[GIN-debug] GET    /api-test                 --> main.main.func1 (5 handlers)
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :5000
-::1 - [Sun, 24 Apr 2022 11:43:22 IST] "POST /user/signup HTTP/1.1 201 5.5580501s "PostmanRuntime/7.29.0" "
+::1 - [Thu, 28 Apr 2022 22:39:31 IST] "GET /api-test HTTP/1.1 200 1.7582ms "PostmanRuntime/7.29.0" "

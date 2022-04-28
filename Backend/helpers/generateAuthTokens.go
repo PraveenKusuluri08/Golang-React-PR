@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -18,10 +19,7 @@ var secretAccessKey = os.Getenv("SECRET_KEY")
 var refreshTokenSecretKey = os.Getenv("REFRESH_TOKEN_SECRET")
 
 type SignDetails struct {
-	Email     string
-	Uid       string
-	Role      string
-	FirstName string
+	Email string
 	jwt.StandardClaims
 }
 
@@ -62,14 +60,11 @@ func GenerateAuthJWTToken(user models.User) (*models.TokenDetails, error) {
 	return td, nil
 }
 
-func GenerateToken(email string, firstName string, uid string, role string) (*models.AuthUsedToken, error) {
+func GenerateToken(email string) (*models.AuthUsedToken, error) {
 	var err error
 	tokenData := &models.AuthUsedToken{}
 	claims := &SignDetails{
-		Email:     email,
-		Uid:       uid,
-		FirstName: firstName,
-		Role:      role,
+		Email: email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(1)).Unix(),
 		},
@@ -113,6 +108,7 @@ func ValidateJwtAuthToken(signedToken string) (claims *SignDetails, msg string) 
 		msg = "Token is expired \n " + err.Error()
 		return
 	}
+	fmt.Println(claims)
 	return claims, msg
 }
 
@@ -139,7 +135,7 @@ func UpdateToken(token string, refreshToken string, uid string) {
 
 	collection := GetCollection(dbName, collectionName)
 
-	_,err:=collection.UpdateOne(ctx, filter, bson.D{
+	_, err := collection.UpdateOne(ctx, filter, bson.D{
 		{"$set", updateObj},
 	}, &opt)
 	defer cancel()
