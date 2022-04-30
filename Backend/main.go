@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/PraveenKusuluri08/golang-jwt-auth/helpers"
@@ -37,12 +35,7 @@ func main() {
 
 	routes.AuthRoutes(router)
 
-	routes.UserRoutes(router)
-
 	router.Use(helpers.EndPoint())
-	router.GET("/api-test", func(c *gin.Context) {
-		fmt.Println(c.Get("email"))
-		c.JSON(http.StatusOK, gin.H{"status": "API-OK 200"})
-	})
+	routes.UserRoutes(router)
 	router.Run(":" + port)
 }

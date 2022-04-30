@@ -53,7 +53,7 @@ func SignUp() gin.HandlerFunc {
 		user.Password = helpers.PasswordHasher(user.Password)
 
 		// token, _ := helpers.GenerateAuthJWTToken(user)
-		tokenData, _ := helpers.GenerateToken(user.Email)
+		tokenData, _ := helpers.GenerateToken(user.Email, user.Role, user.Uid)
 
 		user.Token = tokenData.Token
 		user.RefreshToken = tokenData.RefreshToken
@@ -89,16 +89,16 @@ func SignIn() gin.HandlerFunc {
 		err := collection.FindOne(ctx, filter).Decode(&actualUser)
 		defer cancel()
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid login"})
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid login!", "Message": "Requsting email address is not exists Please try to create new account"})
 			return
 		}
 		match := helpers.CompareHashAndPassword(user.Password, actualUser.Password)
 
 		if !match {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid login Please check password"})
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid login!", "Message": "Email and password not matches"})
 			return
 		}
-		token, _ := helpers.GenerateToken(user.Email)
+		token, _ := helpers.GenerateToken(user.Email, actualUser.Role, actualUser.Uid)
 
 		helpers.UpdateToken(token.Token, token.RefreshToken, actualUser.Uid)
 
