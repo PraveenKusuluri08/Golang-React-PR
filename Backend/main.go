@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -38,7 +39,9 @@ func main() {
 
 	routes.UserRoutes(router)
 
+	router.Use(helpers.EndPoint())
 	router.GET("/api-test", func(c *gin.Context) {
+		fmt.Println(c.Get("email"))
 		c.JSON(http.StatusOK, gin.H{"status": "API-OK 200"})
 	})
 	router.Run(":" + port)
