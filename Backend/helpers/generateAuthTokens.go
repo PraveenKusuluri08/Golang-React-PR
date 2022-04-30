@@ -20,6 +20,8 @@ var refreshTokenSecretKey = os.Getenv("REFRESH_TOKEN_SECRET")
 
 type SignDetails struct {
 	Email string
+	Role  string
+	Uid   string
 	jwt.StandardClaims
 }
 
@@ -60,11 +62,13 @@ func GenerateAuthJWTToken(user models.User) (*models.TokenDetails, error) {
 	return td, nil
 }
 
-func GenerateToken(email string) (*models.AuthUsedToken, error) {
+func GenerateToken(email string, role string, uid string) (*models.AuthUsedToken, error) {
 	var err error
 	tokenData := &models.AuthUsedToken{}
 	claims := &SignDetails{
 		Email: email,
+		Role:  role,
+		Uid:   uid,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(1)).Unix(),
 		},

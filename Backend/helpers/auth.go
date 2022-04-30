@@ -3,8 +3,10 @@ package helpers
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -41,4 +43,21 @@ func CountDocuments(condition bson.M, dbName string, collectionName string) (int
 		return -1, err
 	}
 	return count, nil
+}
+
+func IsAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role := c.GetString("role")
+
+		err := ""
+		if role != "ADMIN" {
+			err = "Unauthorized to view this content! you are not admin"
+		}
+		if err != "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": err})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }

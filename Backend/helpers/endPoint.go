@@ -23,6 +23,8 @@ func EndPoint() gin.HandlerFunc {
 			return
 		}
 		c.Set("email", claims.Email)
+		c.Set("role", claims.Role)
+		c.Set("uid", claims.Uid)
 		c.Next()
 	}
 }
